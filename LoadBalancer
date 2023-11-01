@@ -1,0 +1,134 @@
+HTTP Load Balancer
+
+The objective is to design and build a simple HTTP load balancer that supports the following.
+
+Should bootstrap with a list of backend server URLs and some configuration details like the following
+{
+"backend_servers" :["http://host1.com","http://host2.com",  "http://host3.com"],
+"service_timeout_in_ms": 300,
+"healthcheck_interval_in_seconds": 5,
+“healthcheck_url”: “/health”,
+“healthcheck_port”: 8080,
+"failure_threshold_times": 10,
+"routing-algo": “round-robin”
+}
+
+
+Should proxy the client requests to its backend servers in a round robin fashion and pass on the response from the server to the client. 
+
+Should provide a mechanism (command line or web API) to add, delete backend servers and to get a list of active servers. We should be able to do any of these without restarting the load balancer.
+
+Should do a health check on the backend servers to make sure that they’re up and running. If the server is found to be inactive/down, the load balancer should remove that server from serving active traffic. If a previously inactive server is found back in an active state, the load balancer should start routing traffic to it again.
+
+Should allow the algorithm to be configured as one of round-robin or random. Extend the above configuration to do this and implement a random algorithm.
+
+
+Apis
+/add-worker
+/remove-worker
+/update-routing-algo
+/get-workers
+
+Entities/Classes
+
+RoutingAlgo
+
+Worker
+Services
+Class ActiveWorkerService
+	     
+	Map<String, Worker> activeWorkers;	
+	Map<String, Worker> inactiveWorkers;	
+	HM<String, Algo>> activeAlgoMap;
+
+
+addWorker(String hostname)
+removeWorker(String hostname) -> activeWorkers.remove(hostnmae)
+setActiveAlgo() -> set activeAlgoMap.put(configalog string, new AlgoObject);
+setActiveAlgo(algoString) -> activeAlgoMap.put(configalog string, new AlgoObject);
+getActivel
+List<Worker> getActiveWorkers()
+
+HealthCheckService
+Long healthInterval;
+String healthURI;
+Long noOfAllowedFailures;
+ActiveWorkerService activeWorkerService;
+ConcurrentHM<Worker,failedCount> healthCheckMap;
+Threapool<100> healthCheckWorkers;
+	
+	init(){		
+workersFromConfig.stream().(x -> healthCheckWorkers.put(x,0))
+healthCheckWorkers.forerch(
+perform healthcheck(); 
+// based on results from healthchrck 
+// activeWorkerService.addWorke( worker);
+// if false -> add it to 	> inactiveWorkers;	
+)
+}		
+			
+
+		//ScheduledTask 		
+		activeWorkerService.getAllActiveWorkers().
+		{	
+// perform health check
+			// if true -> add it to activeWorkers;
+			// if false and count breach -> add it to -> inactiveWorkers;	
+}
+
+
+
+Private boolean healthCheck(request, worker){
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+Interface AlgorithmFactory{
+		getNextAvailableWorker();
+}
+
+
+Class RoundRobin implements AlgorithmFactory{
+
+  ActiveWorkerService activeWorkerService;
+
+
+   Worker getNextAvailableWorker(){
+
+    }
+}
+
+Class Random implements AlgorithmFactory{
+
+  ActiveWorkerService activeWorkerService;
+
+   Worker getNextAvailableWorker(){
+	Random randon = new Random(activeWorkerService.getActiveWorkers()))
+	return activeWorkerService.getActiveWorkers(random.getNext())
+    }
+}
+
+
+
+
+
+Class RequestDispatcher {
+		 Response Execute (HTttpRequest  request) {
+Worker worker = activeWorkerService.getActiveAlgo().getNextAvailableWorker();	
+
+RestTemplate rest;
+		}
+
+
+	}
